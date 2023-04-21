@@ -12,7 +12,7 @@ import (
 
 func main() {
 	http.HandleFunc("/foo", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hellom, %q", html.EscapeString(r.URL.Path))
+		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
 	})
 
 	log.Fatalln(http.ListenAndServe(":8080", nil))
