@@ -8,7 +8,7 @@ import (
 
 func RegisterRouter(core *framework.Core) {
 	core.Get("foo", controller.FooControllerHandler)
-	core.Get("/user/login", middleware.Test1(), controller.UserLoginController)
+	core.Get("/user/login", controller.UserLoginController)
 
 	api := core.Group("/api")
 	api.Use(middleware.Test2())

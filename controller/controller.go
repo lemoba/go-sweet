@@ -46,8 +46,9 @@ func FooControllerHandler(c *framework.Context) error {
 }
 
 func UserLoginController(c *framework.Context) error {
-	fmt.Println("user login")
-	c.SetOkStatus().Json("success")
+	foo, _ := c.QueryString("foo", "def")
+	time.Sleep(10 * time.Second)
+	c.SetOkStatus().Json("ok, UserLoginController: " + foo)
 	return nil
 }
 
