@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"github.com/lemoba/go-sweet/framework"
+	"github.com/lemoba/go-sweet/framework/gin"
 )
 
 func Test1() framework.ControllerHandler {
@@ -14,13 +15,12 @@ func Test1() framework.ControllerHandler {
 	}
 }
 
-func Test2() framework.ControllerHandler {
+func Test2() gin.HandlerFunc {
 	// 使用函数回调
-	return func(c *framework.Context) error {
+	return func(c *gin.Context) {
 		fmt.Println("middleware pre test2")
 		c.Next()
 		fmt.Println("middleware post test2")
-		return nil
 	}
 }
 

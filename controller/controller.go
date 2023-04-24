@@ -1,55 +1,53 @@
 package controller
 
 import (
-	"context"
 	"fmt"
-	"github.com/lemoba/go-sweet/framework"
-	"log"
 	"time"
+
+	"github.com/lemoba/go-sweet/framework/gin"
 )
 
-func FooControllerHandler(c *framework.Context) error {
-	finish := make(chan any, 1)
-	panicChan := make(chan any, 1)
-
-	durationCtx, cancel := context.WithTimeout(c.BaseContext(), time.Duration(1*time.Second))
-	defer cancel()
-
-	go func() {
-		defer func() {
-			if p := recover(); p != nil {
-				panicChan <- p
-			}
-		}()
-
-		time.Sleep(10 * time.Second)
-		c.SetOkStatus().Json("ok")
-
-		finish <- struct{}{}
-	}()
-
-	select {
-	case p := <-panicChan:
-		c.WriterMux().Lock()
-		defer c.WriterMux().Unlock()
-		log.Println(p)
-		c.SetStatus(500).Json("panic")
-	case <-finish:
-		fmt.Println("finish")
-	case <-durationCtx.Done():
-		c.WriterMux().Lock()
-		defer c.WriterMux().Unlock()
-		c.SetStatus(500).Json("middleware out")
-		c.SetHasTimeout()
-	}
-	return nil
+func FooControllerHandler(c *gin.Context) {
+	//finish := make(chan any, 1)
+	//panicChan := make(chan any, 1)
+	//
+	//durationCtx, cancel := context.WithTimeout(c.BaseContext(), time.Duration(1*time.Second))
+	//defer cancel()
+	//
+	//go func() {
+	//	defer func() {
+	//		if p := recover(); p != nil {
+	//			panicChan <- p
+	//		}
+	//	}()
+	//
+	//	time.Sleep(10 * time.Second)
+	//	c.ISetOkStatus().IJson("ok")
+	//
+	//	finish <- struct{}{}
+	//}()
+	//
+	//select {
+	//case p := <-panicChan:
+	//	c.WriterMux().Lock()
+	//	defer c.WriterMux().Unlock()
+	//	log.Println(p)
+	//	c.SetStatus(500).Json("panic")
+	//case <-finish:
+	//	fmt.Println("finish")
+	//case <-durationCtx.Done():
+	//	c.WriterMux().Lock()
+	//	defer c.WriterMux().Unlock()
+	//	c.SetStatus(500).Json("middleware out")
+	//	c.SetHasTimeout()
+	//}
+	//return nil
 }
 
-func UserLoginController(c *framework.Context) error {
-	foo, _ := c.QueryString("foo", "def")
+func UserLoginController(c *gin.Context) {
+	foo, _ := c.DefaultQueryString("foo", "def")
 	time.Sleep(10 * time.Second)
-	c.SetOkStatus().Json("ok, UserLoginController: " + foo)
-	return nil
+	c.ISetOkStatus().IJson("ok, UserLoginController: " + foo)
 }
 
 type User struct {
@@ -58,7 +56,7 @@ type User struct {
 	Email string `json:"email"`
 }
 
-func UserListController(c *framework.Context) error {
+func UserListController(c *gin.Context) {
 	fmt.Println("user list")
 
 	list := []User{
@@ -69,7 +67,5 @@ func UserListController(c *framework.Context) error {
 			"golang", 13, "golang@gmail.com",
 		},
 	}
-	c.SetOkStatus().Json(list)
-
-	return nil
+	c.ISetOkStatus().IJson(list)
 }

@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/lemoba/go-sweet/framework/middleware"
-	"github.com/lemoba/go-sweet/route"
 	"log"
 	"net/http"
 	"os"
@@ -11,15 +9,19 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/lemoba/go-sweet/framework"
+	"github.com/lemoba/go-sweet/framework/gin"
+	"github.com/lemoba/go-sweet/route"
 )
 
 func main() {
-	core := framework.NewCore()
+	//core := framework.NewCore()
+	core := gin.New()
 
-	core.Use(middleware.Recovery())
+	//core.Use(middleware.Recovery())
+	core.Use(gin.Recovery())
 
 	route.RegisterRouter(core)
+
 	server := &http.Server{
 		Addr:    ":8888",
 		Handler: core,
