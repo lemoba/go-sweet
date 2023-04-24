@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/lemoba/go-sweet/provider/demo"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +18,8 @@ func main() {
 	//core := framework.NewCore()
 	core := gin.New()
 
+	// 绑定具体的服务
+	core.Bind(&demo.DemoServiceProvider{})
 	//core.Use(middleware.Recovery())
 	core.Use(gin.Recovery())
 

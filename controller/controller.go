@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"github.com/lemoba/go-sweet/provider/demo"
 	"time"
 
 	"github.com/lemoba/go-sweet/framework/gin"
@@ -42,6 +43,11 @@ func FooControllerHandler(c *gin.Context) {
 	//	c.SetHasTimeout()
 	//}
 	//return nil
+	demoService := c.MustMake(demo.Key).(demo.Service)
+
+	foo := demoService.GetFoo()
+
+	c.ISetOkStatus().IJson(foo)
 }
 
 func UserLoginController(c *gin.Context) {

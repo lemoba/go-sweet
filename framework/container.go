@@ -62,73 +62,100 @@ func (s *SweetContainer) PrintProviders() []string {
 }
 
 // Bind 将服务容器和关键字做了绑定
-func (sc *SweetContainer) Bind(provider ServiceProvider) error {
-	sc.lock.Lock()
-	defer sc.lock.Unlock()
+func (s *SweetContainer) Bind(provider ServiceProvider) error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
 	key := provider.Name()
 	if provider.IsDefer() == false {
-		if err := provider.Boot(sc); err != nil {
+		if err := provider.Boot(s); err != nil {
 			return err
 		}
 
 		// 实例化方法
-		params := provider.Params(sc)
-		method := provider.Register(sc)
+		params := provider.Params(s)
+		method := provider.Register(s)
 		instance, err := method(params...)
 		if err != nil {
 			return errors.New(err.Error())
 		}
-		sc.instances[key] = instance
+		s.instances[key] = instance
 	}
 
 	return nil
 }
 
-func (sc *SweetContainer) findServiceProvider(key string) ServiceProvider {
-	sc.lock.RLock()
-	defer sc.lock.RLock()
+func (s *SweetContainer) findServiceProvider(key string) ServiceProvider {
+	s.lock.RLock()
+	defer s.lock.RLock()
 
-	if sp, ok := sc.providers[key]; ok {
+	if sp, ok := s.providers[key]; ok {
 		return sp
 	}
 
 	return nil
 }
 
-func (sc *SweetContainer) IsBind(key string) bool {
-	return sc.findServiceProvider(key) != nil
+func (s *SweetContainer) IsBind(key string) bool {
+	return s.findServiceProvider(key) != nil
 }
 
-func (sc *SweetContainer) Make(key string) (any, error) {
-	return sc.Make
+func (s *SweetContainer) Make(key string) (any, error) {
+	return s.make(key, nil, false)
 }
 
-func (sc *SweetContainer) make(key string, params []any, forceNew bool) (any, error) {
-	sc.lock.RLock()
-	defer sc.lock.RUnlock()
+func (s *SweetContainer) MustMake(key string) any {
+	serv, err := s.make(key, nil, false)
+	if err != nil {
+		panic(err)
+	}
+
+	return serv
+}
+
+func (s *SweetContainer) newInstance(sp ServiceProvider, params []any) (any, error) {
+	if err := sp.Boot(s); err != nil {
+		return nil, err
+	}
+
+	if params == nil {
+		params = sp.Params(s)
+	}
+
+	method := sp.Register(s)
+	ins, err := method(params...)
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	return ins, err
+}
+
+func (s *SweetContainer) make(key string, params []any, forceNew bool) (any, error) {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
 
 	// 查询是否已经注册了这个服务提供者，如果没有注册，则返回错误
-	sp := sc.findServiceProvider(key)
+	sp := s.findServiceProvider(key)
 	if sp == nil {
 		return nil, errors.New("contract" + key + "have not register")
 	}
 
 	if forceNew {
-		return sc.newInstance(sp, params)
+		return s.newInstance(sp, params)
 	}
 
 	// 不需要强制重新实例化，如果容器中已经实例化了，那么就直接使用容器中的实例
-	if ins, ok := sc.instances[key]; ok {
+	if ins, ok := s.instances[key]; ok {
 		return ins, nil
 	}
 
 	// 容器中还未实例化，则进行一次实例化
-	inst, err := sc.newInstance(sp, nil)
+	inst, err := s.newInstance(sp, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	sc.instances[key] = inst
+	s.instances[key] = inst
 	return inst, nil
 }
