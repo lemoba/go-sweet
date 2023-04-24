@@ -39,8 +39,33 @@ func FooControllerHandler(c *framework.Context) error {
 	case <-durationCtx.Done():
 		c.WriterMux().Lock()
 		defer c.WriterMux().Unlock()
-		c.Json(500, "time out")
+		c.Json(500, "middleware out")
 		c.SetHasTimeout()
 	}
 	return nil
+}
+
+func UserLoginController(c *framework.Context) error {
+	fmt.Println("user login")
+	return c.Json(200, "success")
+}
+
+type User struct {
+	Name  string `json:"name"`
+	Age   uint8  `json:"age"`
+	Email string `json:"email"`
+}
+
+func UserListController(c *framework.Context) error {
+	fmt.Println("user list")
+
+	list := []User{
+		{
+			"ranen", 12, "129@qq.com",
+		},
+		{
+			"golang", 13, "golang@gmail.com",
+		},
+	}
+	return c.Json(200, list)
 }
