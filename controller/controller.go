@@ -23,7 +23,7 @@ func FooControllerHandler(c *framework.Context) error {
 		}()
 
 		time.Sleep(10 * time.Second)
-		c.Json(200, "ok")
+		c.SetOkStatus().Json("ok")
 
 		finish <- struct{}{}
 	}()
@@ -33,13 +33,13 @@ func FooControllerHandler(c *framework.Context) error {
 		c.WriterMux().Lock()
 		defer c.WriterMux().Unlock()
 		log.Println(p)
-		c.Json(500, "panic")
+		c.SetStatus(500).Json("panic")
 	case <-finish:
 		fmt.Println("finish")
 	case <-durationCtx.Done():
 		c.WriterMux().Lock()
 		defer c.WriterMux().Unlock()
-		c.Json(500, "middleware out")
+		c.SetStatus(500).Json("middleware out")
 		c.SetHasTimeout()
 	}
 	return nil
@@ -47,7 +47,8 @@ func FooControllerHandler(c *framework.Context) error {
 
 func UserLoginController(c *framework.Context) error {
 	fmt.Println("user login")
-	return c.Json(200, "success")
+	c.SetOkStatus().Json("success")
+	return nil
 }
 
 type User struct {
@@ -67,5 +68,7 @@ func UserListController(c *framework.Context) error {
 			"golang", 13, "golang@gmail.com",
 		},
 	}
-	return c.Json(200, list)
+	c.SetOkStatus().Json(list)
+
+	return nil
 }
