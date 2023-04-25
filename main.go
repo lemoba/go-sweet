@@ -29,7 +29,6 @@ func main() {
 		Addr:    ":8888",
 		Handler: core,
 	}
-
 	// 这个goroutine是启动服务的goroutine
 	go func() {
 		server.ListenAndServe()
