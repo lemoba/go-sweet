@@ -67,6 +67,9 @@ func (s *SweetContainer) Bind(provider ServiceProvider) error {
 	defer s.lock.Unlock()
 
 	key := provider.Name()
+
+	s.providers[key] = provider
+
 	if provider.IsDefer() == false {
 		if err := provider.Boot(s); err != nil {
 			return err
@@ -109,7 +112,6 @@ func (s *SweetContainer) MustMake(key string) any {
 	if err != nil {
 		panic(err)
 	}
-
 	return serv
 }
 
@@ -138,7 +140,7 @@ func (s *SweetContainer) make(key string, params []any, forceNew bool) (any, err
 	// 查询是否已经注册了这个服务提供者，如果没有注册，则返回错误
 	sp := s.findServiceProvider(key)
 	if sp == nil {
-		return nil, errors.New("contract" + key + "have not register")
+		return nil, errors.New("contract" + key + " have not register")
 	}
 
 	if forceNew {
