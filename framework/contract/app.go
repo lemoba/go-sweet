@@ -1,5 +1,7 @@
 package contract
 
+const AppKey = "hade:app"
+
 type App interface {
 	// Version 定义当前版本
 	Version() string
